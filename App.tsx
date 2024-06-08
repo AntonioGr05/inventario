@@ -10,7 +10,7 @@ import Home from './app/screens/Home';
 import Login from './app/screens/Login';
 import ProductDetails, {
   Params as ProductDetailsParams,
-} from './app/screens/productDetails';
+} from './app/screens/ProductDetails';
 import ProductAdd from './app/screens/ProductAdd';
 import {Button} from 'react-native';
 
@@ -24,6 +24,13 @@ export type RootStackParamList = {
 };
 
 /* creamos el archivo app/screens/Home.tsx */
+function HomeHeader(): React.JSX.Element {
+  const navigation = useNavigation<NavigationProp<RootStackParamList>>();
+  return (
+    <Button title="Agregar" onPress={() => navigation.navigate('ProductAdd')} />
+  );
+}
+
 function App(): React.JSX.Element {
   return (
     <NavigationContainer>
@@ -42,6 +49,7 @@ function App(): React.JSX.Element {
           options={{
             headerShown: true,
             headerStyle: {backgroundColor: 'blue'},
+            headerRight: HomeHeader,
           }}
         />
         <Stack.Screen
@@ -52,6 +60,7 @@ function App(): React.JSX.Element {
             headerStyle: {backgroundColor: 'red'},
           }}
         />
+        <Stack.Screen name="ProductAdd" component={ProductAdd} />
       </Stack.Navigator>
     </NavigationContainer>
   );

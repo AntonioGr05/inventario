@@ -2,11 +2,9 @@ import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
 import React, {useEffect, useState} from 'react';
 import {
-  Button,
   SafeAreaView,
   StyleSheet,
   Text,
-  Touchable,
   View,
 } from 'react-native';
 import {Product} from './model/Product';

@@ -1,17 +1,13 @@
 import {RouteProp} from '@react-navigation/native';
 import {StackNavigationProp} from '@react-navigation/stack';
-import {useNavigation} from '@react-navigation/native';
 import React, {useEffect, useState} from 'react';
 import {SafeAreaView, StyleSheet, Text, View} from 'react-native';
 import {Product} from '../models/product';
 import {FlatList, TouchableOpacity} from 'react-native-gesture-handler';
-import {Props as ProductDetailsProps} from './ProductDetails';
+/* import {Props as ProductDetailsProps} from './ProductDetails'; */
+import {RootStackParamList} from '../../App';
+import LocalDB from '../persistance/localdb';
 
-type RootStackParamList = {
-  Home: undefined;
-  Login: undefined;
-  ProductDetails: ProductDetailsProps;
-};
 type HomeScreenProps = StackNavigationProp<RootStackParamList, 'Home'>;
 type HomeScreenRoute = RouteProp<RootStackParamList, 'Home'>;
 
@@ -25,7 +21,7 @@ function Home({navigation}: HomeProps): React.JSX.Element {
   const productItem = ({item}: {item: Product}) => (
     <TouchableOpacity
       style={styles.productItem}
-      onPress={() => navigation.navigate('ProductDetails', {product: item})}>
+      onPress={() => navigation.push('ProductDetails', {product: item})}>
       <View style={{flexDirection: 'row', justifyContent: 'space-between'}}>
         <View style={{flexDirection: 'column'}}>
           <Text style={styles.itemTitle}>{item.nombre}</Text>
@@ -57,25 +53,19 @@ function Home({navigation}: HomeProps): React.JSX.Element {
   );
 
   useEffect(() => {
-    setProducts([
-      {
-        id: 1,
-        nombre: 'Martillo',
-        precio: 80,
-        minStock: 5,
-        currentStock: 2,
-        maxStock: 20,
-      },
-      {
-        id: 2,
-        nombre: 'Manguera',
-        precio: 15,
-        minStock: 50,
-        currentStock: 200,
-        maxStock: 1000,
-      },
-    ]);
-  }, []);
+    LocalDB.init();
+    navigation.addListener('focus', async () => {
+      const db = await LocalDB.connect();
+      db.transaction(async tx => {
+        tx.executeSql(
+          'SELECT * FROM productos',
+          [],
+          (_, res) => setProducts(res.rows.raw()),
+          error => console.error({error}),
+        );
+      });
+    });
+  }, [navigation]);
 
   return (
     <SafeAreaView>
